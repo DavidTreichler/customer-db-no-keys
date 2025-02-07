@@ -18,4 +18,8 @@ one-to-one - each value of a table is linked to a singular value in another tabl
 one-to-many - singular value in a table connects with multiple values in another table (i.e. single customer can place many orders, but a specific order can only be placed by a single customer)
 many-to-many - several values in one table link to multiple values in another table 
 
-
+![SAM Tables’ ERD Diagram](sam-tables-erd.JPG)
+![eBuy Tables’ ERD Diagram](ebuy-tables-erd.JPG)
+![Salesforce Tables’ ERD Diagram](salesforce-tables-erd.JPG)
+![Advantage Tables’ ERD Diagram](advantage-tables-erd.JPG)
+![Eloqua Tables’ ERD Diagram](eloqua-tables-erd.JPG)
