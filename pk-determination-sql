@@ -1,0 +1,157 @@
+-- Primary Key (PK) Determination for DB w/o keys assigned
+-- Salesforce Tables 
+--PK Test:
+SELECT COUNT(id) as all_ids,COUNT(distinct id) as distinct_ids FROM *.s_salesforce_account --count of all ids is the same as distinct ids, so all ids are distinct and all values are unique.
+SELECT * from *.s_salesforce_user WHERE id IS NULL --test to determine if column is NULL.
+--GROUP where PK = id
+--*.s_salesforce_account - id 
+--*.s_salesforce_campaign - id 
+--*.s_salesforce_campaignmember - id 
+--*.s_salesforce_campaignmember_limited - id 
+--*.s_salesforce_case - id 
+--*.s_salesforce_recordtype - id 
+--*.s_salesforce_opportunity - id 
+--*.s_salesforce_lead - id 
+--*.s_salesforce_event - id  
+--*.s_salesforce_contact - id 
+--*.s_salesforce_task - id 
+--*.s_salesforce_user - id 
+--GROUP DO NOT USE
+--*.s_salesforce_category - DOES NOT EXIST
+--*.s_salesforce_subcategory - DOES NOT EXIST
+--END of Salesforce.
+
+-- eBuy Tables
+--PK Test:
+SELECT COUNT (quote_key) as all_quotekeys, COUNT(distinct quote_key) as distinct_quotekeys FROM *.s_ebuy_quote  --Yes, 3,140,774 = 3,140,774
+SELECT COUNT (quote_key) as all_quotekeys, COUNT(distinct quote_key) as distinct_quotekeys FROM *.s_ebuy_quote_limited --Yes.
+SELECT COUNT (rfq_key) as all_quotekeys, COUNT(distinct rfq_key) as distinct_quotekeys FROM *.s_ebuy_rfq --Yes
+SELECT COUNT (rfq_key) as all_quotekeys, COUNT(distinct rfq_key) as distinct_quotekeys FROM *.s_ebuy_rfq_limited --Yes
+SELECT COUNT (rfq_schedule_key) as all_quotekeys, COUNT(distinct rfq_schedule_key) as distinct_quotekeys FROM *.s_ebuy_rfq_schedule --Yes
+SELECT COUNT (rfq_schedule_key) as all_quotekeys, COUNT(distinct rfq_schedule_key) as distinct_quotekeys FROM *.s_ebuy_rfq_schedule_limited --Yes
+SELECT COUNT (rfq_vendor_key) as all_quotekeys, COUNT(distinct rfq_vendor_key) as distinct_quotekeys FROM *.s_ebuy_rfq_vendor --Yes
+SELECT COUNT (rfq_vendor_key) as all_quotekeys, COUNT(distinct rfq_vendor_key) as distinct_quotekeys FROM *.s_ebuy_rfq_vendor_limited --Yes
+SELECT COUNT (rfqid) as all_quotekeys, COUNT(distinct rfqid) as distinct_quotekeys FROM *.s_ebuy_open --yes
+SELECT COUNT (rfq_status_key) as all_quotekeys, COUNT(distinct rfq_status_key) as distinct_quotekeys FROM *.s_ebuy_rfq_status --yes 
+
+--GROUP
+--*.s_ebuy_quote - quote_key 
+--*.s_ebuy_quote_limited - quote_key 
+--GROUP
+--*.s_ebuy_rfq - rfq_key 
+--*.s_ebuy_rfq_limited - rfq_key 
+--GROUP
+--*.s_ebuy_rfq_schedule - rfq_schedule_key 
+--*.s_ebuy_rfq_schedule_limited - rfq_schedule_key 
+--GROUP
+--*.s_ebuy_rfq_vendor - rfq_vendor_key 
+--*.s_ebuy_rfq_vendor_limited - rfq_vendor_key 
+--MISC 1 Off GROUP
+--*.s_ebuy_open - rfqid 
+--*.s_ebuy_rfq_status - rfq_status_key 
+--END of eBuy.
+
+-- System for Award Management (SAM) Tables
+-- Note: Underlying data quality issues with SAM Tables 
+--PK Test:
+SELECT COUNT(fhorgid) as all_fhorgids,COUNT(distinct fhorgid) as distinct_fhorgids FROM *.s_sam_federal_hierarchy --284,671 = 284,671
+SELECT COUNT(city+fhorgid) as all_fhorgids,COUNT(distinct city+fhorgid) as distinct_fhorgids FROM *.s_sam_federal_hierarchy_address --Does not exist.
+SELECT COUNT(fhorgid+officetype+officetypeenddate+officetypestartdate) as all_fhorgids,COUNT(distinct fhorgid+officetype+officetypeenddate+officetypestartdate) as distinct_fhorgids FROM *.s_sam_federal_hierarchy_officetype --fhorgid is NOT. You have to use all of the fields, wow.
+SELECT COUNT(fhfullparentpathid) as all_fhorgids,COUNT(distinct fhfullparentpathid) as distinct_fhorgids FROM *.s_sam_federal_hierarchy_parenthistory --fhorgid is 10k off. fhfullparentpathid is very close. combining them doesn't help.
+SELECT COUNT(noticeid) as all_fhorgids,COUNT(distinct noticeid) as distinct_fhorgids FROM *.s_sam_opportunities --yes, noticeid.
+SELECT COUNT(noticeid) as all_fhorgids,COUNT(distinct noticeid) as distinct_fhorgids FROM *.s_sam_archived_opportunities --yes, noticeid.
+--GROUP
+--*.s_sam_opportunities - noticeid  ("award_awardee_ueisam" matches UEI and UEISAM (even though 82% of field is null), so map to sam crosswalk and sam entity tables). 
+--*.s_sam_archived_opportunities - noticeid 
+--GROUP
+--*.s_sam_uei_to_naics_crosswalk - uei
+--*.s_sam_uei_to_psc_crosswalk - uei
+--MISC 1 OFF GROUP
+--*.s_sam_federal_hierarchy - fhorgid 
+--*.s_sam_federal_hierarchy_parenthistory - fhfullparentpathid  (good for 98% of rows) 
+--GROUP DOES NOT EXIST
+--*.s_sam_federal_hierarchy_address - DOES NOT EXIST. 
+--*.s_sam_federal_hierarchy_officetype - DOES NOT EXIST. 
+--*.s_sam_entity - DOES NOT EXIST - wanted to use ueisam as "uei", but you get multiple rows for a single ueisam. 59% of ueisam are distinct, and the other 41% are not distinct.
+--END of SAM. 
+
+-- GSA Advantage Tables 
+--PK Tests
+Select * FROM *.s_advantage_address
+SELECT COUNT (address_key) as all_quotekeys, COUNT(distinct address_key) as distinct_quotekeys FROM *.s_advantage_address --yes, address key.
+--
+SELECT COUNT (contract_key) as all_quotekeys, COUNT(distinct contract_key) as distinct_quotekeys FROM *.s_advantage_contract --done
+SELECT COUNT (day_key) as all_keys, COUNT(distinct day_key) as distinct_keys FROM *.s_advantage_day --done
+SELECT COUNT (extended_price+shopper_key+line_item_identity+line_item_key+shipping_address_key+product_key) as all_keys, COUNT(distinct extended_price+shopper_key+line_item_identity+line_item_key+shipping_address_key+product_key) as distinct_keys FROM *.s_advantage_line_item --and still is not distinct, so does Not exist.
+s_advantage_line_item_limited --same as above
+SELECT COUNT (product_key) as all_quotekeys, COUNT(distinct product_key) as distinct_quotekeys FROM *.s_advantage_product --bingo
+SELECT COUNT (product_key) as all_quotekeys, COUNT(distinct product_key) as distinct_quotekeys FROM *.s_advantage_product_limited --yes
+SELECT COUNT (purchase_key) as all_quotekeys, COUNT(distinct purchase_key) as distinct_quotekeys FROM *.s_advantage_purchase  --done
+SELECT COUNT (purchase_key) as all_quotekeys, COUNT(distinct purchase_key) as distinct_quotekeys FROM *.s_advantage_purchase_limited  --done
+SELECT COUNT (schedule_key) as all_quotekeys, COUNT(distinct schedule_key) as distinct_quotekeys FROM *.s_advantage_sched  --done
+SELECT COUNT (shopper_key) as all_quotekeys, COUNT(distinct shopper_key) as distinct_quotekeys FROM *.s_advantage_shopper  --done
+SELECT COUNT (summary_key) as all_quotekeys, COUNT(distinct summary_key) as distinct_quotekeys FROM *.s_advantage_summary  --done
+SELECT COUNT (vendor_key) as all_quotekeys, COUNT(distinct vendor_key) as distinct_quotekeys FROM *.s_advantage_vendor  --done
+
+--GROUP
+--*.s_advantage_line_item - DOES NOT EXIST
+--*.s_advantage_line_item_limited - DOES NOT EXIST
+--GROUP 
+--*.s_advantage_product - product_key 
+--*.s_advantage_product_limited - product_key 
+--GROUP
+--*.s_advantage_purchase - purchase_key 
+--*.s_advantage_purchase_limited - purchase_key 
+--MISC 1 OFF GROUP
+--*.s_advantage_sched - schedule_key 
+--*.s_advantage_shopper - shopper_key 
+--*.s_advantage_summary - summary_key 
+--*.s_advantage_vendor - vendor_key 
+--*.s_advantage_address - address_key 
+--*.s_advantage_contract - contract_key 
+--*.s_advantage_day - day_key 
+--End of Advantage.
+
+-- Eloqua Tables:
+--PK Tests: 
+SELECT COUNT (eloqua_company_id) as all_quotekeys, COUNT(distinct eloqua_company_id) as distinct_quotekeys FROM *.s_eloqua_accounts --yes, done.
+SELECT COUNT (id) as all_quotekeys, COUNT(distinct id) as distinct_quotekeys FROM *.s_eloqua_bounceback --yes, done. 
+SELECT COUNT (contactidext) as all_quotekeys, COUNT(distinct contactidext) as distinct_quotekeys FROM *.s_eloqua_contacts --yes, done. 
+SELECT COUNT (id) as all_quotekeys, COUNT(distinct id) as distinct_quotekeys FROM *.s_eloqua_emailclickthrough --yes, done. 
+SELECT COUNT (id) as all_quotekeys, COUNT(distinct id) as distinct_quotekeys FROM *.s_eloqua_emailopen --yes, done.
+SELECT COUNT (id) as all_quotekeys, COUNT(distinct id) as distinct_quotekeys FROM *.s_eloqua_emailsend --yes, very close. 
+SELECT COUNT (id) as all_quotekeys, COUNT(distinct id) as distinct_quotekeys FROM *.s_eloqua_formsubmit --yes, done. 
+SELECT COUNT (id) as all_quotekeys, COUNT(distinct id) as distinct_quotekeys FROM *.s_eloqua_pageview --yes, done
+SELECT COUNT (id) as all_quotekeys, COUNT(distinct id) as distinct_quotekeys FROM *.s_eloqua_subscribe --yes, done
+SELECT COUNT (id) as all_quotekeys, COUNT(distinct id) as distinct_quotekeys FROM *.s_eloqua_unsubscribe --yes, done.
+SELECT COUNT (id) as all_quotekeys, COUNT(distinct id) as distinct_quotekeys FROM *.s_eloqua_webvisit --yes, done. 
+--GROUP
+--*.s_eloqua_emailclickthrough - id
+--*.s_eloqua_emailopen - id
+--*.s_eloqua_emailsend - id
+--*.s_eloqua_bounceback - id
+--*.s_eloqua_formsubmit - id
+--*.s_eloqua_pageview - id
+--*.s_eloqua_subscribe - id
+--*.s_eloqua_unsubscribe - id
+--*.s_eloqua_webvisit - id
+--GROUP MISC One off
+--*.s_eloqua_accounts - eloqua_company_id
+--*.s_eloqua_contacts - contactidext
+--End of Eloqua. 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Workaround to Add PK to Redshift in existing DB
+--Source: https://stackoverflow.com/questions/73138106/add-not-null-constraint-to-exsisting-column-in-redshift
+--Steps: Create a new column with PK, copy values from old column, drop old column, rename new column with desired name
+ALTER TABLE "dev"."public"."tbl1" ADD w VARCHAR(255) NOT NULL default 'A'; --alters target table by adding column w with datatype variable length string, max 255) that is not null, default value 'A' is added if no other value is specified
+UPDATE "dev"."public"."tbl1" SET w=x; --set values of new column w equal to old column x
+ALTER TABLE "dev"."public"."tbl1" ADD CONSTRAINT PK_1 PRIMARY KEY (w); --add primary key to column w
+ALTER TABLE "dev"."public"."tbl1" DROP COLUMN x; --drop old column x
+ALTER TABLE "dev"."public"."tbl1" RENAME COLUMN w TO x; --rename new column to old column name
+--Example
+ALTER TABLE *.s_salesforce_account ADD newcolumn VARCHAR(255) NOT NULL default 'Placeholder';
+UPDATE *.s_salesforce_account SET newcolumn=id;
+ALTER TABLE *.s_salesforce_account ADD CONSTRAINT PK_1 PRIMARY KEY (newcolumn);
+ALTER TABLE *.s_salesforce_account DROP COLUMN id;
+ALTER TABLE *.s_salesforce_account RENAME COLUMN newcolumn TO id;
+
